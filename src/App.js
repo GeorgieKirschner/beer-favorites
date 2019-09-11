@@ -2,31 +2,24 @@ import React, { Component } from "react";
 import "./App.css";
 import CreateBeer from "./CreateBeer";
 import BeerList from "./BeerList";
+import axios from "axios";
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      beers: [
-        {
-          id: 0,
-          name: "Choco Stout",
-          edit: false
-        },
-        {
-          id: 1,
-          name: "Blonde White",
-          edit: false
-        },
-        {
-          id: 2,
-          name: "Thunder Monkey",
-          edit: false
-        }
-      ],
+      beers: [],
       newBeerCounter: 3,
       newBeerName: ""
     };
+  }
+
+  componentDidMount() {
+    axios.get("/beers").then(response => {
+      this.setState({
+        beers: response.data
+      });
+    });
   }
 
   setEdit = (e, beerId) => {
@@ -64,18 +57,18 @@ class App extends Component {
     });
   }
 
-  handleSubmit(e, newBeerName) {
+  handleSubmit(e, name, brewery) {
     e.preventDefault();
-    this.setState({
-      beers: [
-        ...this.state.beers,
-        {
-          id: this.state.newBeerCounter,
-          name: newBeerName
-        }
-      ],
-      newBeerCounter: this.state.newBeerCounter + 1
-    });
+    axios
+      .post("/beers", {
+        name: name,
+        abv: 4.0,
+        ibu: 60,
+        brewery_id: parseInt(brewery)
+      })
+      .then(response => {
+        this.setState({ beers: response.data });
+      });
   }
 
   render() {
